@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ public class ContactDataSource {
     public void close() {
         dbHelper.close();
     }
+
     public boolean insertContact(Contact c) {
         boolean didSucceed = false;
         try {
@@ -67,10 +69,11 @@ public class ContactDataSource {
         }
         return didSucceed;
     }
+
     public int getLastContactID() {
         int lastId;
         try {
-            String query = "Select MAX(_id) from contact";
+            String query = "SELECT MAX(_id) FROM contact";
             Cursor cursor = database.rawQuery(query, null);
 
             cursor.moveToFirst();
@@ -82,10 +85,10 @@ public class ContactDataSource {
         return lastId;
     }
 
-    public ArrayList<String> getContactName(){
+    public ArrayList<String> getContactName() {
         ArrayList<String> contactNames = new ArrayList<>();
         try {
-            String query = "Select contactname from contact";
+            String query = "SELECT contactname FROM contact";
             Cursor cursor = database.rawQuery(query, null);
 
             cursor.moveToFirst();
@@ -93,23 +96,22 @@ public class ContactDataSource {
                 contactNames.add(cursor.getString(0));
                 cursor.moveToNext();
             }
-                cursor.close();
-        }
-        catch(Exception e){
+            cursor.close();
+        } catch (Exception e) {
             contactNames = new ArrayList<>();
         }
         return contactNames;
     }
 
     public ArrayList<Contact> getContacts() {
-        ArrayList<Contact> contacts = new ArrayList<Contact>();
-        try{
+        ArrayList<Contact> contacts = new ArrayList<>();
+        try {
             String query = "SELECT * FROM contact";
             Cursor cursor = database.rawQuery(query, null);
 
             Contact newContact;
             cursor.moveToFirst();
-            while(!cursor.isAfterLast()){
+            while (!cursor.isAfterLast()) {
                 newContact = new Contact();
                 newContact.setContactID(cursor.getInt(0));
                 newContact.setContactName(cursor.getString(1));
@@ -120,17 +122,17 @@ public class ContactDataSource {
                 newContact.setPhoneNumber(cursor.getString(6));
                 newContact.setCellNumber(cursor.getString(7));
                 newContact.setEMail(cursor.getString(8));
+
                 Calendar calendar = Calendar.getInstance();
-                calendar.setTimeInMillis(Long.valueOf(cursor.getString(9)));
+                calendar.setTimeInMillis(Long.parseLong(cursor.getString(9)));
                 newContact.setBirthday(calendar);
+
                 contacts.add(newContact);
                 cursor.moveToNext();
-
             }
             cursor.close();
-        }
-        catch (Exception e) {
-            contacts = new ArrayList<Contact>();
+        } catch (Exception e) {
+            contacts = new ArrayList<>();
         }
         return contacts;
     }

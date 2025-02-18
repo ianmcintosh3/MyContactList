@@ -98,4 +98,10 @@ public class Contact {
     public void setEMail(String s) {
         eMail = s;
     }
+    public Contact(int contactID, String contactName, String phoneNumber) {
+        this.contactID = contactID;
+        this.contactName = contactName;
+        this.phoneNumber = phoneNumber;
+    }
 }
+

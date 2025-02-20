@@ -11,7 +11,7 @@ public class Contact {
     private String zipCode;
     private String phoneNumber;
     private String cellNumber;
-    private String eMail;
+    private String EMail;
     private Calendar birthday;
 
     public Contact() {
@@ -92,11 +92,11 @@ public class Contact {
     }
 
     public String getEMail() {
-        return eMail;
+        return EMail;
     }
 
     public void setEMail(String s) {
-        eMail = s;
+        EMail = s;
     }
     public Contact(int contactID, String contactName, String phoneNumber) {
         this.contactID = contactID;

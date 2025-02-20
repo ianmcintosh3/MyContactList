@@ -1,9 +1,13 @@
 package com.example.mycontactlist;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -18,7 +22,8 @@ import java.util.ArrayList;
 
 public class ContactListActivity extends AppCompatActivity {
 
-    private ArrayList<Contact> contacts; // Store contact objects instead of names
+    private ArrayList<Contact> contacts;
+    private ContactAdapter contactAdapter;
 
     private View.OnClickListener onItemClickListener = new View.OnClickListener() {
         @Override
@@ -27,9 +32,10 @@ public class ContactListActivity extends AppCompatActivity {
             int position = viewHolder.getAdapterPosition();
             int contactId = contacts.get(position).getContactID(); // Retrieve the contact ID
 
-            // Pass contact ID to MainActivity
+            //contactID to main
             Intent intent = new Intent(ContactListActivity.this, MainActivity.class);
             intent.putExtra("contactID", contactId);
+            //add Email here?
             startActivity(intent);
         }
     };
@@ -39,12 +45,12 @@ public class ContactListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact_list);
 
-        // Initialize navigation buttons
         initListButton();
         initMapButton();
         initSettingsButton();
+        initAddContactButton();
 
-        // Retrieve contacts from the database
+        // contacts from base
         ContactDataSource ds = new ContactDataSource(this);
 
         try {
@@ -52,7 +58,7 @@ public class ContactListActivity extends AppCompatActivity {
             contacts = ds.getContacts(); // Retrieve full contact objects
             ds.close();
 
-            // Set up RecyclerView
+            //Recycler
             RecyclerView contactList = findViewById(R.id.rvContacts);
             RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
             contactList.setLayoutManager(layoutManager);
@@ -65,6 +71,7 @@ public class ContactListActivity extends AppCompatActivity {
         } catch (Exception e) {
             Toast.makeText(this, "Error retrieving contacts", Toast.LENGTH_LONG).show();
         }
+        initDeleteSwitch();
     }
 
     private void initListButton() {
@@ -94,4 +101,26 @@ public class ContactListActivity extends AppCompatActivity {
             startActivity(intent);
         });
     }
+    private void initAddContactButton(){
+        Button newContact = findViewById(R.id.buttonAddContact);
+        newContact.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v){
+                Intent intent = new Intent(ContactListActivity.this,MainActivity.class);
+                startActivity(intent);
+            }
+        });
+    }
+    private void initDeleteSwitch(){
+        @SuppressLint("UseSwitchCompatOrMaterialCode") Switch s = findViewById(R.id.switchDelete);
+        s.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                Boolean status = compoundButton.isChecked();
+                contactAdapter.setDelete(status);
+                contactAdapter.notifyDataSetChanged();
+            }
+        });
+
+    }
+
 }

@@ -22,15 +22,22 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
     private boolean isDeleting;
     private Context parentContext;
 
+    public ContactAdapter(ArrayList<Contact> arrayList, Context context){
+        this.contactData = arrayList;
+        this.parentContext = context;
+    }
+
     public static class ContactViewHolder extends RecyclerView.ViewHolder {
         public TextView textViewContact;
         public TextView textPhone;
+        public TextView textEmail;
         public Button deleteButton;
 
         public ContactViewHolder(@NonNull View itemView) {
             super(itemView);
             textViewContact = itemView.findViewById(R.id.textContactName);
             textPhone = itemView.findViewById(R.id.textPhoneNumber);
+            textEmail = itemView.findViewById(R.id.textEmail);
             deleteButton = itemView.findViewById(R.id.buttonDeleteContact);
 
             itemView.setTag(this);
@@ -44,6 +51,9 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
         public TextView getPhoneTextView() {
             return textPhone;
         }
+        public TextView getEmailTextView(){
+            return textEmail;
+        }
 
         public Button getDeleteButton() {
             return deleteButton;
@@ -53,10 +63,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
     public ContactAdapter(ArrayList<Contact> contacts) {
         this.contactData = contacts;
     }
-    public ContactAdapter(ArrayList<Contact> arrayList, Context context){
-        this.contactData = arrayList;
-        this.parentContext = context;
-    }
+
 
     public void setOnItemClickListener(View.OnClickListener itemClickListener) {
         mOnItemClickListener = itemClickListener;
@@ -74,6 +81,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
         Contact currentContact = contactData.get(position);
         holder.getContactTextView().setText(currentContact.getContactName());
         holder.getPhoneTextView().setText(currentContact.getPhoneNumber());
+        holder.getEmailTextView().setText(currentContact.getEMail());
         if(isDeleting) {
             holder.getDeleteButton().setVisibility(View.VISIBLE);
             holder.getDeleteButton().setOnClickListener(new View.OnClickListener() {
@@ -91,6 +99,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
         isDeleting = b;
 
     }
+    @SuppressLint("NotifyDataSetChanged")
     private void deleteItem(int position){
         Contact contact = contactData.get(position);
         ContactDataSource ds = new ContactDataSource(parentContext);

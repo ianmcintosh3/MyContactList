@@ -1,12 +1,14 @@
 package com.example.mycontactlist;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.Toast;
 
@@ -50,12 +52,18 @@ public class ContactListActivity extends AppCompatActivity {
         initSettingsButton();
         initAddContactButton();
 
+
+        String sortBy = getSharedPreferences("MyContactListPreferences",
+                Context.MODE_PRIVATE).getString("sortfield", "contactname");
+        String sortOrder = getSharedPreferences("MyContactListPreferences",
+                Context.MODE_PRIVATE).getString("sortorder","ASC");
+
         // contacts from base
         ContactDataSource ds = new ContactDataSource(this);
 
         try {
             ds.open();
-            contacts = ds.getContacts(); // Retrieve full contact objects
+            contacts = ds.getContacts(sortBy,sortOrder); //contact objects
             ds.close();
 
             //Recycler
@@ -63,8 +71,8 @@ public class ContactListActivity extends AppCompatActivity {
             RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
             contactList.setLayoutManager(layoutManager);
 
-            // Initialize Adapter with contacts and set click listener
-            ContactAdapter contactAdapter = new ContactAdapter(contacts);
+
+            contactAdapter = new ContactAdapter(contacts, this);
             contactAdapter.setOnItemClickListener(onItemClickListener);
             contactList.setAdapter(contactAdapter);
 
@@ -72,11 +80,16 @@ public class ContactListActivity extends AppCompatActivity {
             Toast.makeText(this, "Error retrieving contacts", Toast.LENGTH_LONG).show();
         }
         initDeleteSwitch();
+        //initDeleteContactButton();
     }
+//    public void onResume(){
+//        super.onResume();
+//        String sortBy = getSharedPreferences("MyCont")
+//    }
 
     private void initListButton() {
         ImageButton ibList = findViewById(R.id.imageButtonList);
-        ibList.setEnabled(false); // Disable List button in this activity
+        ibList.setEnabled(false); //disable
         ibList.setOnClickListener(v -> {
             Intent intent = new Intent(ContactListActivity.this, ContactListActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -113,6 +126,7 @@ public class ContactListActivity extends AppCompatActivity {
     private void initDeleteSwitch(){
         @SuppressLint("UseSwitchCompatOrMaterialCode") Switch s = findViewById(R.id.switchDelete);
         s.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 Boolean status = compoundButton.isChecked();
@@ -122,5 +136,43 @@ public class ContactListActivity extends AppCompatActivity {
         });
 
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+            String sortBy = getSharedPreferences("MyContactListPreferences",
+                    Context.MODE_PRIVATE).getString("sortfield", "contactname");
+            String sortOrder = getSharedPreferences("MyContactListPreferences",
+                    Context.MODE_PRIVATE).getString("sortorder", "ASC");
+
+            // contacts from base
+            ContactDataSource ds = new ContactDataSource(this);
+
+            try {
+                ds.open();
+                contacts = ds.getContacts(sortBy, sortOrder); //contact objects
+                ds.close();
+                if(contacts.size() > 0){
+
+                //Recycler
+                RecyclerView contactList = findViewById(R.id.rvContacts);
+                RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+                contactList.setLayoutManager(layoutManager);
+
+
+                contactAdapter = new ContactAdapter(contacts, this);
+                contactAdapter.setOnItemClickListener(onItemClickListener);
+                contactList.setAdapter(contactAdapter);
+
+            }
+            else{
+                    Intent intent = new Intent(ContactListActivity.this, MainActivity.class);
+                    startActivity(intent);
+                }
+
+            } catch (Exception e) {
+                Toast.makeText(this, "Error retrieving contacts", Toast.LENGTH_LONG).show();
+            }
+        }
 
 }

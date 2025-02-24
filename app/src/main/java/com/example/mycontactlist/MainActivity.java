@@ -355,6 +355,23 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 currentContact.setCellNumber(etCellPhone.getText().toString());
             }
         });
+        final EditText etEmail = findViewById(R.id.editEMail);
+        etEmail.addTextChangedListener(new PhoneNumberFormattingTextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                currentContact.setEMail(etEmail.getText().toString());
+            }
+        });
     }
     private void initContact(int id){
         ContactDataSource ds = new ContactDataSource(MainActivity.this);
@@ -388,4 +405,5 @@ public class MainActivity extends AppCompatActivity implements DatePickerDialog.
                 currentContact.getBirthday().getTimeInMillis()).toString());
 
     }
+
 }

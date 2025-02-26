@@ -9,8 +9,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -26,6 +28,7 @@ public class ContactMapActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_contact_map);
+        initGetLocationButton();
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.map), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -34,9 +37,10 @@ public class ContactMapActivity extends AppCompatActivity {
         initListButton();
         initMapButton();
         initSettingsButton();
-        initGetLocationButton();
+        //initGetLocationButton();
     }
-    private void initListButton(){
+
+    private void initListButton() {
         ImageButton ibList = findViewById(R.id.imageButtonList);
         ibList.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -47,6 +51,7 @@ public class ContactMapActivity extends AppCompatActivity {
             }
         });
     }
+
     private void initMapButton() {
         ImageButton ibList = findViewById(R.id.imageButtonMap);
         ibList.setEnabled(false);
@@ -59,6 +64,7 @@ public class ContactMapActivity extends AppCompatActivity {
             }
         });
     }
+
     private void initSettingsButton() {
         ImageButton ibList = findViewById(R.id.imageButtonSettings);
         ibList.setOnClickListener(new View.OnClickListener() {
@@ -73,6 +79,7 @@ public class ContactMapActivity extends AppCompatActivity {
     private void initGetLocationButton(){
         Button locationButton = (Button) findViewById(R.id.buttonGetLocation);
         locationButton.setOnClickListener(new View.OnClickListener(){
+
             @Override
             public void onClick(View v){
                 EditText editAddress = (EditText) findViewById(R.id.editAddress);
@@ -81,17 +88,19 @@ public class ContactMapActivity extends AppCompatActivity {
                 EditText editZipCode = (EditText) findViewById(R.id.editZipcode);
 
                 String address = editAddress.getText().toString() + ", " +
-                            editCity.getText().toString() + ", " +
-                            editState.getText().toString() + ", " +
-                            editZipCode.getText().toString();
+                        editCity.getText().toString() + ", " +
+                        editState.getText().toString() + ", " +
+                        editZipCode.getText().toString();
+
                 List<Address> addresses = null;
                 Geocoder geo = new Geocoder(ContactMapActivity.this);
                 try{
                     addresses = geo.getFromLocationName(address, 1);
                 }
-                catch (IOException e){
+                catch(IOException e){
                     e.printStackTrace();
                 }
+
                 TextView txtLatitude = (TextView) findViewById(R.id.textLatitude);
                 TextView txtLongitude = (TextView) findViewById(R.id.textLongitude);
 
@@ -100,4 +109,9 @@ public class ContactMapActivity extends AppCompatActivity {
             }
         });
     }
+
+
+
+
+
 }

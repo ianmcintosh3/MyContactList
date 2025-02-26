@@ -11,6 +11,8 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.Button;
@@ -33,6 +35,7 @@ public class ContactMapActivity extends AppCompatActivity {
 
     LocationManager locationManager;
     LocationListener gpsListener;
+    final int PERMISSION_REQUEST_LOCATION = 101;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,34 +110,45 @@ public class ContactMapActivity extends AppCompatActivity {
                 List<Address> addresses = null;
                 Geocoder geo = new Geocoder(ContactMapActivity.this);
                 try {
-                    locationManager = (LocationManager) getBaseContext()
-                            .getSystemService(Context.LOCATION_SERVICE);
+                    if (Build.VERSION.SDK_INT >= 23) {
+                        if (ContextCompat.checkSelfPermission(ContactMapActivity.this,
+                                android.Manifest.permission.ACCESS_FINE_LOCATION) !=
+                                PackageManager.PERMISSION_GRANTED) {
 
-                    gpsListener = new LocationListener() {
-                        public void onLocationChanged(Location location) {
-                            TextView txtLatitude = (TextView) findViewById(R.id.textLatitude);
-                            TextView txtLongitude = (TextView) findViewById(R.id.textLongitude);
-                            TextView txtAccuracy = (TextView) findViewById(R.id.textAccuracy);
+                            if (ActivityCompat.shouldShowRequestPermissionRationale(
+                                    ContactMapActivity.this,
+                                    android.Manifest.permission.ACCESS_FINE_LOCATION)) {
 
-                            txtLatitude.setText(String.valueOf(location.getLatitude()));
-                            txtLongitude.setText(String.valueOf(location.getLongitude()));
-                            txtAccuracy.setText(String.valueOf(location.getAccuracy()));
+                                Snackbar.make(findViewById(R.id.map),
+                                                "MyContactList requires this permission to locate " +
+                                                        "your contacts", Snackbar.LENGTH_INDEFINITE)
+                                        .setAction("OK", new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View view) {
+                                                ActivityCompat.requestPermissions(
+                                                        ContactMapActivity.this,
+                                                        new String[]{
+                                                                android.Manifest.permission.ACCESS_FINE_LOCATION
+                                                        },
+                                                        PERMISSION_REQUEST_LOCATION);
+                                            }
+                                        }).show();
+                            } else {
+                                ActivityCompat.requestPermissions(ContactMapActivity.this,
+                                        new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                                        PERMISSION_REQUEST_LOCATION);
+                            }
+                        } else {
+                            startLocationUpdates();
                         }
-
-                        public void onStatusChanged(String provider, int status, Bundle extras) {}
-
-                        public void onProviderEnabled(String provider) {}
-
-                        public void onProviderDisabled(String provider) {}
-                    };
-
-                    locationManager.requestLocationUpdates(
-                            LocationManager.GPS_PROVIDER, 0, 0, gpsListener
-                    );
+                    } else {
+                        startLocationUpdates();
+                    }
                 } catch (Exception e) {
-                    Toast.makeText(getBaseContext(), "Error, Location not available",
+                    Toast.makeText(getBaseContext(), "Error requesting permission",
                             Toast.LENGTH_LONG).show();
                 }
+
 
 
                 TextView txtLatitude = (TextView) findViewById(R.id.textLatitude);
@@ -149,6 +163,15 @@ public class ContactMapActivity extends AppCompatActivity {
     @Override
     public void onPause(){
         super.onPause();
+        if (Build.VERSION.SDK_INT >= 23 &&
+                ContextCompat.checkSelfPermission(getBaseContext(),
+                        android.Manifest.permission.ACCESS_FINE_LOCATION) !=
+                        PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(getBaseContext(),
+                        android.Manifest.permission.ACCESS_COARSE_LOCATION) !=
+                        PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
         try{
             locationManager.removeUpdates(gpsListener);
         }
@@ -199,6 +222,25 @@ public class ContactMapActivity extends AppCompatActivity {
 
 
     }
+    @SuppressLint("MissingSuperCall")
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSION_REQUEST_LOCATION: {
+                if (grantResults.length > 0 &&
+                        grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    startLocationUpdates();
+                } else {
+                    Toast.makeText(ContactMapActivity.this,
+                            "MyContactList will not locate your contacts.",
+                            Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+    }
+
 
 
 

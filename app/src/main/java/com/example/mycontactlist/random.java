@@ -63,4 +63,75 @@ public class random {
 //            }
 //        });
 //    }
+
+
+
+
+
+    //    private void startLocationUpdates(){
+//        if (Build.VERSION.SDK_INT >= 23 &&
+//                ContextCompat.checkSelfPermission(getBaseContext(),
+//                        android.Manifest.permission.ACCESS_FINE_LOCATION) !=
+//                        PackageManager.PERMISSION_GRANTED &&
+//                ContextCompat.checkSelfPermission(getBaseContext(),
+//                        android.Manifest.permission.ACCESS_COARSE_LOCATION) !=
+//                        PackageManager.PERMISSION_GRANTED) {
+//            return;
+//        }
+//        try {
+//            locationManager = (LocationManager) getBaseContext()
+//                    .getSystemService(Context.LOCATION_SERVICE);
+//
+//            gpsListener = new LocationListener() {
+//                public void onLocationChanged(Location location) {
+//                    TextView txtLatitude = (TextView) findViewById(R.id.textLatitude);
+//                    TextView txtLongitude = (TextView) findViewById(R.id.textLongitude);
+//                    TextView txtAccuracy = (TextView) findViewById(R.id.textAccuracy);
+//                if(isBetterLocation(location)) { //IMPORTANT
+//                    currentBestLocation = location;
+//                    txtLatitude.setText(String.valueOf(location.getLatitude()));
+//                    txtLongitude.setText(String.valueOf(location.getLongitude()));
+//                    txtAccuracy.setText(String.valueOf(location.getAccuracy()));
+//                }
+//                }
+//
+//                public void onStatusChanged(String provider, int status, Bundle extras) {}
+//
+//                public void onProviderEnabled(String provider) {}
+//
+//                public void onProviderDisabled(String provider) {}
+//            };
+//            networkListener = new LocationListener() {
+//                public void onLocationChanged(Location location) {
+//                    TextView txtLatitude = (TextView) findViewById(R.id.textLatitude);
+//                    TextView txtLongitude = (TextView) findViewById(R.id.textLongitude);
+//                    TextView txtAccuracy = (TextView) findViewById(R.id.textAccuracy);
+//                if(isBetterLocation(location)) {  //IMPORTANT
+//                    currentBestLocation = location;
+//                    txtLatitude.setText(String.valueOf(location.getLatitude()));
+//                    txtLongitude.setText(String.valueOf(location.getLongitude()));
+//                    txtAccuracy.setText(String.valueOf(location.getAccuracy()));
+//                }
+//                }
+//
+//                public void onStatusChanged(String provider, int status, Bundle extras) {}
+//
+//                public void onProviderEnabled(String provider) {}
+//
+//                public void onProviderDisabled(String provider) {}
+//            };
+//
+//            locationManager.requestLocationUpdates(
+//                    LocationManager.GPS_PROVIDER, 0, 0, gpsListener
+//            );
+//            locationManager.requestLocationUpdates(
+//                    LocationManager.NETWORK_PROVIDER,0,0,networkListener
+//            );
+//        } catch (Exception e) {
+//            Toast.makeText(getBaseContext(), "Error, Location not available",
+//                    Toast.LENGTH_LONG).show();
+//        }
+//
+//
+//    }
 }

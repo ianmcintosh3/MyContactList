@@ -2,6 +2,7 @@ package com.example.mycontactlist;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -82,6 +83,13 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
         holder.getContactTextView().setText(currentContact.getContactName());
         holder.getPhoneTextView().setText(currentContact.getPhoneNumber());
         holder.getEmailTextView().setText(currentContact.getEMail());
+        if (position % 2 == 0){
+            holder.getContactTextView().setTextColor(Color.RED);
+        }
+        else{
+            holder.getContactTextView().setTextColor(Color.BLUE);
+        }
+
         if(isDeleting) {
             holder.getDeleteButton().setVisibility(View.VISIBLE);
             holder.getDeleteButton().setOnClickListener(new View.OnClickListener() {

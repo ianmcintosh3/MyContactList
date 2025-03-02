@@ -11,9 +11,6 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -24,9 +21,13 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
 import java.util.List;
@@ -36,6 +37,8 @@ public class ContactMapActivity extends AppCompatActivity {
     LocationManager locationManager;
     LocationListener gpsListener;
     final int PERMISSION_REQUEST_LOCATION = 101;
+    LocationListener networkListener;
+    Location currentBestLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,52 +113,55 @@ public class ContactMapActivity extends AppCompatActivity {
                 List<Address> addresses = null;
                 Geocoder geo = new Geocoder(ContactMapActivity.this);
                 try {
-                    if (Build.VERSION.SDK_INT >= 23) {
-                        if (ContextCompat.checkSelfPermission(ContactMapActivity.this,
-                                android.Manifest.permission.ACCESS_FINE_LOCATION) !=
-                                PackageManager.PERMISSION_GRANTED) {
+                    addresses = geo.getFromLocationName(address, 1);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
-                            if (ActivityCompat.shouldShowRequestPermissionRationale(
-                                    ContactMapActivity.this,
-                                    android.Manifest.permission.ACCESS_FINE_LOCATION)) {
+                if (Build.VERSION.SDK_INT >= 23) {
+                    if (ContextCompat.checkSelfPermission(ContactMapActivity.this,
+                            android.Manifest.permission.ACCESS_FINE_LOCATION) !=
+                            PackageManager.PERMISSION_GRANTED) {
 
-                                Snackbar.make(findViewById(R.id.map),
-                                                "MyContactList requires this permission to locate " +
-                                                        "your contacts", Snackbar.LENGTH_INDEFINITE)
-                                        .setAction("OK", new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View view) {
-                                                ActivityCompat.requestPermissions(
-                                                        ContactMapActivity.this,
-                                                        new String[]{
-                                                                android.Manifest.permission.ACCESS_FINE_LOCATION
-                                                        },
-                                                        PERMISSION_REQUEST_LOCATION);
-                                            }
-                                        }).show();
-                            } else {
-                                ActivityCompat.requestPermissions(ContactMapActivity.this,
-                                        new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-                                        PERMISSION_REQUEST_LOCATION);
-                            }
+                        if (ActivityCompat.shouldShowRequestPermissionRationale(
+                                ContactMapActivity.this,
+                                android.Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+                            Snackbar.make(findViewById(R.id.map),
+                                            "MyContactList requires this permission to locate " +
+                                                    "your contacts", Snackbar.LENGTH_INDEFINITE)
+                                    .setAction("OK", new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            ActivityCompat.requestPermissions(
+                                                    ContactMapActivity.this,
+                                                    new String[]{
+                                                            android.Manifest.permission.ACCESS_FINE_LOCATION
+                                                    },
+                                                    PERMISSION_REQUEST_LOCATION);
+                                        }
+                                    }).show();
                         } else {
-                            startLocationUpdates();
+                            ActivityCompat.requestPermissions(ContactMapActivity.this,
+                                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                                    PERMISSION_REQUEST_LOCATION);
                         }
                     } else {
                         startLocationUpdates();
                     }
-                } catch (Exception e) {
-                    Toast.makeText(getBaseContext(), "Error requesting permission",
-                            Toast.LENGTH_LONG).show();
+                } else {
+                    startLocationUpdates();
                 }
-
-
 
                 TextView txtLatitude = (TextView) findViewById(R.id.textLatitude);
                 TextView txtLongitude = (TextView) findViewById(R.id.textLongitude);
 
-                txtLatitude.setText(String.valueOf(addresses.get(0).getLatitude()));
-                txtLongitude.setText(String.valueOf(addresses.get(0).getLongitude()));
+                if (addresses != null && !addresses.isEmpty()) {
+                    txtLatitude.setText(String.valueOf(addresses.get(0).getLatitude()));
+                    txtLongitude.setText(String.valueOf(addresses.get(0).getLongitude()));
+                } else {
+                    Toast.makeText(ContactMapActivity.this, "Address not found", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
@@ -174,6 +180,7 @@ public class ContactMapActivity extends AppCompatActivity {
         }
         try{
             locationManager.removeUpdates(gpsListener);
+            locationManager.removeUpdates(networkListener);
         }
         catch(Exception e){
             e.printStackTrace();
@@ -199,10 +206,31 @@ public class ContactMapActivity extends AppCompatActivity {
                     TextView txtLatitude = (TextView) findViewById(R.id.textLatitude);
                     TextView txtLongitude = (TextView) findViewById(R.id.textLongitude);
                     TextView txtAccuracy = (TextView) findViewById(R.id.textAccuracy);
-
+                if(isBetterLocation(location)) { //IMPORTANT
+                    currentBestLocation = location;
                     txtLatitude.setText(String.valueOf(location.getLatitude()));
                     txtLongitude.setText(String.valueOf(location.getLongitude()));
                     txtAccuracy.setText(String.valueOf(location.getAccuracy()));
+                }
+                }
+
+                public void onStatusChanged(String provider, int status, Bundle extras) {}
+
+                public void onProviderEnabled(String provider) {}
+
+                public void onProviderDisabled(String provider) {}
+            };
+            networkListener = new LocationListener() {
+                public void onLocationChanged(Location location) {
+                    TextView txtLatitude = (TextView) findViewById(R.id.textLatitude);
+                    TextView txtLongitude = (TextView) findViewById(R.id.textLongitude);
+                    TextView txtAccuracy = (TextView) findViewById(R.id.textAccuracy);
+                if(isBetterLocation(location)) {  //IMPORTANT
+                    currentBestLocation = location;
+                    txtLatitude.setText(String.valueOf(location.getLatitude()));
+                    txtLongitude.setText(String.valueOf(location.getLongitude()));
+                    txtAccuracy.setText(String.valueOf(location.getAccuracy()));
+                }
                 }
 
                 public void onStatusChanged(String provider, int status, Bundle extras) {}
@@ -214,6 +242,9 @@ public class ContactMapActivity extends AppCompatActivity {
 
             locationManager.requestLocationUpdates(
                     LocationManager.GPS_PROVIDER, 0, 0, gpsListener
+            );
+            locationManager.requestLocationUpdates(
+                    LocationManager.NETWORK_PROVIDER,0,0,networkListener
             );
         } catch (Exception e) {
             Toast.makeText(getBaseContext(), "Error, Location not available",
@@ -239,6 +270,19 @@ public class ContactMapActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+    private boolean isBetterLocation(Location location){
+        boolean isBetter = false;
+        if(currentBestLocation == null) {
+            isBetter = true;
+        }
+        else if (location.getAccuracy() <= currentBestLocation.getAccuracy()){
+            isBetter = true;
+        }
+        else if (location.getTime() - currentBestLocation.getTime() > 5*60*1000){
+            isBetter = true;
+        }
+        return isBetter;
     }
 
 

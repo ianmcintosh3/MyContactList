@@ -30,6 +30,10 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+//    packagingOptions {
+//        exclude 'META-INF/androidx.localbroadcastmanager_localbroadcastmanager.version'
+//        exclude 'META-INF/android.support.localbroadcastmanager.version'
+//    }
 }
 
 dependencies {
@@ -37,10 +41,11 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
-    implementation(libs.locationdelegation)
-    implementation(libs.design)
-    implementation(libs.play.services)
+    //implementation(libs.design)
     implementation(libs.multidex)
+    implementation(libs.play.services.maps)
+    implementation(libs.play.services.maps.license)
+    implementation(libs.play.services.location)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

@@ -1,8 +1,11 @@
 package com.example.mycontactlist;
 
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.BatteryManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -10,6 +13,7 @@ import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -56,14 +60,14 @@ public class ContactListActivity extends AppCompatActivity {
         String sortBy = getSharedPreferences("MyContactListPreferences",
                 Context.MODE_PRIVATE).getString("sortfield", "contactname");
         String sortOrder = getSharedPreferences("MyContactListPreferences",
-                Context.MODE_PRIVATE).getString("sortorder","ASC");
+                Context.MODE_PRIVATE).getString("sortorder", "ASC");
 
         // contacts from base
         ContactDataSource ds = new ContactDataSource(this);
 
         try {
             ds.open();
-            contacts = ds.getContacts(sortBy,sortOrder); //contact objects
+            contacts = ds.getContacts(sortBy, sortOrder); //contact objects
             ds.close();
 
             //Recycler
@@ -79,6 +83,7 @@ public class ContactListActivity extends AppCompatActivity {
         } catch (Exception e) {
             Toast.makeText(this, "Error retrieving contacts", Toast.LENGTH_LONG).show();
         }
+
         initDeleteSwitch();
         //initDeleteContactButton();
     }

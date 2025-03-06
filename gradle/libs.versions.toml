@@ -14,6 +14,7 @@ playServicesMaps = "19.1.0"
 playServicesLocationLicense = "12.0.1"
 locationdelegation = "1.1.1"
 multidex = "1.0.3"
+playServicesMapsLicense = "12.0.1"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -30,6 +31,7 @@ play-services-maps = { group = "com.google.android.gms", name = "play-services-m
 play-services-location-license = { group = "com.google.android.gms", name = "play-services-location-license", version.ref = "playServicesLocationLicense" }
 locationdelegation = { group = "com.google.androidbrowserhelper", name = "locationdelegation", version.ref = "locationdelegation" }
 multidex = { group = "com.android.support", name = "multidex", version.ref = "multidex" }
+play-services-maps-license = { group = "com.google.android.gms", name = "play-services-maps-license", version.ref = "playServicesMapsLicense" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

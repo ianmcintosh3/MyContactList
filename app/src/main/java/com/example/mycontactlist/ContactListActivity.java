@@ -55,6 +55,21 @@ public class ContactListActivity extends AppCompatActivity {
         initMapButton();
         initSettingsButton();
         initAddContactButton();
+        BroadcastReceiver batteryReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                double batteryLevel = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
+                double levelScale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, 0);
+                int batteryPercent = (int) Math.floor(batteryLevel / levelScale * 100);
+                TextView textBatteryState = (TextView)findViewById(R.id.textBatteryLevel);
+                //TextView textMainBatteryState = (TextView)findViewById(R.id.textMainBatteryLevel);
+                textBatteryState.setText(batteryPercent + "%");
+                //textMainBatteryState.setText(batteryPercent + "%");
+
+            }
+        };
+        IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        registerReceiver(batteryReceiver, filter);
 
 
         String sortBy = getSharedPreferences("MyContactListPreferences",
